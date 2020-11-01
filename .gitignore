@@ -13,7 +13,7 @@ BenchmarkDotNet.Artifacts/
 src/SignalR/clients/**/dist/
 modules/
 .ionide/
-URL.db
+URL_DATABASE.db
 
 # File extensions
 *.aps
