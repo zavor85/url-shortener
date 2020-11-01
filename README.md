@@ -1,4 +1,4 @@
-URL Shortener Project which can shorten any long URL to short one.
+URL Shortener Project C# which can shorten any long URL to short one.
 
 Main logic for URL shortener in App folder
 API logic in Controllers folder 
