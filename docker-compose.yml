@@ -1,8 +1,0 @@
-version: '3.4'
-
-services:
-  shorturl:
-    image: ${DOCKER_REGISTRY-}zavor/shorturl
-    build:
-      context: .
-      dockerfile: ShortURL\Dockerfile
