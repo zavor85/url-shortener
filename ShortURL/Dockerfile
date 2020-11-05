@@ -1,0 +1,25 @@
+#See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
+
+#Depending on the operating system of the host machines(s) that will build or run the containers, the image specified in the FROM statement may need to be changed.
+#For more information, please see https://aka.ms/containercompat
+
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-nanoserver-1903 AS base
+WORKDIR /app
+EXPOSE 7000
+
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1-nanoserver-1903 AS build
+WORKDIR /src
+COPY ["ShortURL/ShortURL.csproj", "ShortURL/"]
+RUN dotnet restore "ShortURL/ShortURL.csproj"
+COPY . .
+WORKDIR "/src/ShortURL"
+RUN dotnet build "ShortURL.csproj" -c Release -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "ShortURL.csproj" -c Release -o /app/publish
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENV ASPNETCORE_URLS http://*:7000
+ENTRYPOINT ["dotnet", "ShortURL.dll"]
