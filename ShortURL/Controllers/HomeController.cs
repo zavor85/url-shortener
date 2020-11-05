@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Linq;
+using LiteDB;
 using Microsoft.AspNetCore.Mvc;
-using ShortURL.App;
-using ShortURL.Models;
 
-namespace ShortURL.Controllers
+namespace ShortURL
 {
     public class HomeController : Controller
     {
+        private readonly ILiteCollection<ZavorURL> _liteDbCollection = new LiteDB.LiteDatabase(@"Filename=URL_DATABASE.db; Connection=shared").GetCollection<ZavorURL>();
+
         [HttpGet, Route("/")]
         public IActionResult Index()
         {
@@ -23,13 +24,12 @@ namespace ShortURL.Controllers
                 {
                     url = "http://" + url;
                 }
-                if (new LiteDB.LiteDatabase(@"Filename=URL_DATABASE.db; Connection=shared")
-                    .GetCollection<ZavorURL>().Exists(u => u.ShortenedURL == url))
+                if (_liteDbCollection.Exists(u => u.ShortenedURL == url))
                 {
                     Response.StatusCode = 405;
                     return Json(new URLResponse() { Url = url, Status = "Already shortened", Token = null });
                 }
-                Shortener shortURL = new Shortener(url);
+                IShortener shortURL = new Shortener(url);
                 return Json(shortURL.Token);
             }
             catch (Exception ex)
@@ -38,8 +38,7 @@ namespace ShortURL.Controllers
                 {
                     Response.StatusCode = 400;
                     return Json(new URLResponse() { Url = url, Status = "URL already exists", Token = 
-                        new LiteDB.LiteDatabase(@"Filename=URL_DATABASE.db; Connection=shared")
-                            .GetCollection<ZavorURL>().Find(u => u.URL == url).FirstOrDefault().Token });
+                        _liteDbCollection.Find(u => u.URL == url).FirstOrDefault().Token });
                 }
                 throw new Exception(ex.Message);
             }
@@ -48,8 +47,7 @@ namespace ShortURL.Controllers
         [HttpGet, Route("/{token}")]
         public IActionResult ZavorRedirect([FromRoute] string token)
         {
-            return Redirect(new LiteDB.LiteDatabase(@"Filename=URL_DATABASE.db; Connection=shared")
-                .GetCollection<ZavorURL>().FindOne(u => u.Token == token).URL);
+            return Redirect(_liteDbCollection.FindOne(u => u.Token == token).URL);
         }
     }
 }

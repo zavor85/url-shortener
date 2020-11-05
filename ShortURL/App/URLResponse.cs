@@ -1,6 +1,6 @@
-﻿namespace ShortURL.Models
+﻿namespace ShortURL
 {
-    public class URLResponse
+    public class URLResponse : IURLResponse
     {
         public string Url { get; set; }
         public string Status { get; set; }

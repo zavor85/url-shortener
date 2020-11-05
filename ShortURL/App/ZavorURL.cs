@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace ShortURL.Models
+namespace ShortURL
 {
-	public class ZavorURL
+    public class ZavorURL : IZavorURL
     {
         public Guid ID { get; set; }
         public string URL { get; set; }
